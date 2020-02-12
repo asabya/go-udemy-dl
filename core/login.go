@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/Sab94/go-udemy-dl/repo"
 )
 
 func (dl *Downloader) GetLogin() {
@@ -35,7 +36,7 @@ func (dl *Downloader) GetLogin() {
 		log.Fatal(err)
 	}
 
-	// Find the review items
+	// Find the csrf
 	doc.Find("input").Each(func(i int, s *goquery.Selection) {
 		name, _ := s.Attr("name")
 		if name == "csrfmiddlewaretoken" {
@@ -79,5 +80,9 @@ func (dl *Downloader) DoLogin(email, password string) {
 		} else if v.Name == "client_id" {
 			dl.ClientID = v.Value
 		}
+	}
+	err = repo.Init(dl.Root, email, dl.ClientID, dl.AccessToken, "cookies", dl.BaseURL.String())
+	if err != nil {
+		log.Fatal(err.Error())
 	}
 }

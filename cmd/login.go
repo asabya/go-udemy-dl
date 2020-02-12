@@ -31,7 +31,7 @@ func initLogin(dl *core.Downloader) {
 
 			dl.GetLogin()
 			dl.DoLogin(username, password)
-			dl.List()
+			// dl.List()
 			return nil
 		},
 	}
