@@ -3,6 +3,7 @@ package repo
 import (
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"sync"
 
@@ -15,11 +16,12 @@ type Session struct {
 	BaseURL     string
 	Username    string
 	AccessToken string
-	Cookies     string
+	CSRF        string
+	Cookies     []*http.Cookie
 	ClientID    string
 }
 
-func Init(repoPath, username, clientId, accessToken, cookies, baseURL string) error {
+func Init(repoPath, username, clientId, accessToken, csrf, baseURL string, cookies []*http.Cookie) error {
 	pkgLock.Lock()
 	defer pkgLock.Unlock()
 
@@ -44,6 +46,7 @@ func Init(repoPath, username, clientId, accessToken, cookies, baseURL string) er
 		Cookies:     cookies,
 		AccessToken: accessToken,
 		BaseURL:     baseURL,
+		CSRF:        csrf,
 	}
 
 	// Write to session
@@ -104,7 +107,7 @@ func RemoveRepo(repoPath string) error {
 }
 
 func writeSession(session Session, repoPath string) error {
-	file, err := json.MarshalIndent(session, "", " ")
+	file, err := json.MarshalIndent(session, "", "\t")
 	if err != nil {
 		return err
 	}

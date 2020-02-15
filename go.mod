@@ -4,6 +4,8 @@ go 1.13
 
 require (
 	github.com/PuerkitoBio/goquery v1.5.1
+	github.com/gosuri/uilive v0.0.4 // indirect
+	github.com/gosuri/uiprogress v0.0.1
 	github.com/manifoldco/promptui v0.7.0
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/sirupsen/logrus v1.4.2 // indirect

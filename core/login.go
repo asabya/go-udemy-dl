@@ -81,7 +81,7 @@ func (dl *Downloader) DoLogin(email, password string) {
 			dl.ClientID = v.Value
 		}
 	}
-	err = repo.Init(dl.Root, email, dl.ClientID, dl.AccessToken, "cookies", dl.BaseURL.String())
+	err = repo.Init(dl.Root, email, dl.ClientID, dl.AccessToken, dl.CSRF, dl.BaseURL.String(), dl.Client.Jar.Cookies(dl.BaseURL))
 	if err != nil {
 		log.Fatal(err.Error())
 	}

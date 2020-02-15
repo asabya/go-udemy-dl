@@ -25,5 +25,6 @@ var rootCmd = &cobra.Command{
 func Execute() error {
 	dl := core.New()
 	initLogin(dl)
+	initList(dl)
 	return rootCmd.Execute()
 }
