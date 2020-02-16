@@ -12,7 +12,7 @@ import (
 func initList(dl *core.Downloader) {
 	listCmd := &cobra.Command{
 		Use:   "list",
-		Short: "List Subscribed Cources",
+		Short: "List Subscribed Courses",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			isLoggedin := repo.IsInitialized(dl.Root + string(os.PathSeparator) + "session")
 			if isLoggedin {
