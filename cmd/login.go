@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"log"
 
 	"github.com/Sab94/go-udemy-dl/core"
 	"github.com/spf13/cobra"
@@ -16,22 +15,26 @@ func initLogin(dl *core.Downloader) {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			// Parse username flag
 			username, _ := cmd.Flags().GetString("username")
-
 			// Parse password flag
 			password, _ := cmd.Flags().GetString("password")
 
-			log.Printf("Got username and password : %s %s\n", username, password)
 			if username == "" && password == "" {
 				err := errors.New("Username and password cannot be blank")
 				return err
 			}
-
-			dl.GetLogin()
-			dl.DoLogin(username, password)
-			// dl.List()
+			err := dl.GetLogin()
+			if err != nil {
+				cmd.Printf("Login failed : %s\n", err.Error())
+				return err
+			}
+			err = dl.DoLogin(username, password)
+			if err != nil {
+				cmd.Printf("Login failed : %s\n", err.Error())
+				return err
+			}
+			cmd.Println("Login Successful")
 			return nil
 		},
 	}

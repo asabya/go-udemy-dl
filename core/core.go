@@ -43,11 +43,3 @@ func New() *Downloader {
 		Root:    root,
 	}
 }
-
-func (d *Downloader) SetBaseURL(url *url.URL) {
-	d.BaseURL = url
-}
-
-func (d *Downloader) SetCSRF(csrf string) {
-	d.CSRF = csrf
-}
