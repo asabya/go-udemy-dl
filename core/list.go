@@ -14,6 +14,7 @@ import (
 
 	"github.com/Sab94/go-udemy-dl/repo"
 	"github.com/gosuri/uiprogress"
+	"github.com/manifoldco/promptui"
 )
 
 type Course struct {
@@ -89,14 +90,28 @@ func (dl *Downloader) List() {
 	data, _ := ioutil.ReadAll(resp.Body)
 	var j ListResponse
 	_ = json.Unmarshal(data, &j)
-	// l, _ := json.MarshalIndent(j, "", " ")
-	k := j.Results
-	// l := k[0].(map[string]interface{})
-	// for i, j := range l {
-	// 	log.Println(i, j)
-	// }
-	dl.fetchCource(k[0].ID)
 
+	k := j.Results
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\U0001F449 {{ .Title | cyan }})",
+		Inactive: "  {{ .Title | cyan }}",
+		Selected: "\U0001F449 {{ .Title | green | cyan }}",
+	}
+
+	prompt := promptui.Select{
+		Label:     "Select Course",
+		Items:     k,
+		Size:      50,
+		Templates: templates,
+	}
+
+	i, _, err := prompt.Run()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	log.Printf("Downloading : %s\n", k[i].Title)
+	dl.fetchCource(k[i].ID)
 }
 
 func (dl *Downloader) fetchCource(id int64) {
@@ -165,10 +180,27 @@ func (dl *Downloader) fetchCource(id int64) {
 			}
 		}
 	}
-	// log.Printf("%+v \n %+v", allVideosList, unique(resolutionChoices))
+	resolutions := unique(resolutionChoices)
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\U0001F449 {{ . | cyan }})",
+		Inactive: "  {{ . | cyan }}",
+		Selected: "\U0001F449 {{ . | green | cyan }}",
+	}
 
+	prompt := promptui.Select{
+		Label:     "Select Course",
+		Items:     resolutions,
+		Size:      50,
+		Templates: templates,
+	}
+
+	_, result, err := prompt.Run()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 	for _, v := range allVideosList {
-		dl.readyDownload(v, "720")
+		dl.readyDownload(v, result)
 	}
 }
 
