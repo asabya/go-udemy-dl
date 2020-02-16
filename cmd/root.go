@@ -9,7 +9,8 @@ var rootCmd = &cobra.Command{
 	Use:   "go-udemy-dl",
 	Short: "Go Udemy Downloader",
 	Long: `
-   Go Udemy Downloader is a udemy downloader for porsonal offline use.
+   Go Udemy Downloader is another udemy downloader written in go for
+	 personal offline use.
 	`,
 }
 

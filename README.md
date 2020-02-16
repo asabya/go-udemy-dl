@@ -1,6 +1,6 @@
 # go-udemy-dl
 
-Go Udemy Downloader is another udemy downloader written in go for porsonal offline use.
+Go Udemy Downloader is another udemy downloader written in go for personal offline use.
 
 # Install
 
@@ -11,7 +11,8 @@ Go Udemy Downloader is another udemy downloader written in go for porsonal offli
 ```
 $ go-udemy-dl -h
 
-   Go Udemy Downloader is a udemy downloader for porsonal offline use.
+  Go Udemy Downloader is another udemy downloader written in go for
+  personal offline use.
 
 Usage:
   go-udemy-dl [command]
