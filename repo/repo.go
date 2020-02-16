@@ -13,6 +13,7 @@ import (
 var pkgLock sync.Mutex
 
 type Session struct {
+	Business    string
 	BaseURL     string
 	Username    string
 	AccessToken string
@@ -21,7 +22,7 @@ type Session struct {
 	ClientID    string
 }
 
-func Init(repoPath, username, clientId, accessToken, csrf, baseURL string, cookies []*http.Cookie) error {
+func Init(repoPath, username, clientId, accessToken, csrf, baseURL, business string, cookies []*http.Cookie) error {
 	pkgLock.Lock()
 	defer pkgLock.Unlock()
 
@@ -47,6 +48,7 @@ func Init(repoPath, username, clientId, accessToken, csrf, baseURL string, cooki
 		AccessToken: accessToken,
 		BaseURL:     baseURL,
 		CSRF:        csrf,
+		Business:    business,
 	}
 
 	// Write to session
@@ -93,19 +95,6 @@ func createSession(repoPath string) error {
 	return nil
 }
 
-func RemoveRepo(repoPath string) error {
-	// Check if directory is initialized
-	if _, e := os.Stat(repoPath); e == nil && !os.IsNotExist(e) {
-		// Try to remove the repo directory
-		e = os.RemoveAll(repoPath)
-		if e != nil {
-			log.Fatalf("Failed removing repo directory Err:%s", e.Error())
-			return e
-		}
-	}
-	return nil
-}
-
 func writeSession(session Session, repoPath string) error {
 	file, err := json.MarshalIndent(session, "", "\t")
 	if err != nil {
@@ -126,4 +115,12 @@ func GetSession(repoPath string) (*Session, error) {
 	err := json.Unmarshal([]byte(file), &data)
 
 	return data, err
+}
+
+func RemoveRepo(repoPath string) error {
+	_, e := os.Stat(repoPath)
+	if e == nil {
+		return os.Remove(repoPath + string(os.PathSeparator) + "session")
+	}
+	return e
 }

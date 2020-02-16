@@ -2,7 +2,7 @@ package core
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -19,6 +19,7 @@ type Downloader struct {
 	CSRF        string
 	AccessToken string
 	ClientID    string
+	Business    string
 }
 
 func New() *Downloader {
@@ -31,23 +32,16 @@ func New() *Downloader {
 	}
 	usr, err := user.Current()
 	if err != nil {
-		log.Printf("Failed getting user home directory. Is USER set?\n")
+		fmt.Printf("Failed getting user home directory. Is USER set?\n")
 	}
 	root := usr.HomeDir + string(os.PathSeparator) + ".gud"
 
 	return &Downloader{
-		BaseURL: u,
-		Context: ctx,
-		Cancel:  cancel,
-		Client:  client,
-		Root:    root,
+		BaseURL:  u,
+		Context:  ctx,
+		Cancel:   cancel,
+		Client:   client,
+		Root:     root,
+		Business: "null",
 	}
-}
-
-func (d *Downloader) SetBaseURL(url *url.URL) {
-	d.BaseURL = url
-}
-
-func (d *Downloader) SetCSRF(csrf string) {
-	d.CSRF = csrf
 }
