@@ -19,10 +19,16 @@ func initLogin(dl *core.Downloader) {
 			username, _ := cmd.Flags().GetString("username")
 			// Parse password flag
 			password, _ := cmd.Flags().GetString("password")
+			// Parse business flag
+			business, _ := cmd.Flags().GetString("business")
 
 			if username == "" && password == "" {
 				err := errors.New("Username and password cannot be blank")
+				cmd.Printf("Login failed : %s\n", err.Error())
 				return err
+			}
+			if business != "" {
+				dl.Business = business
 			}
 			err := dl.GetLogin()
 			if err != nil {
@@ -41,4 +47,5 @@ func initLogin(dl *core.Downloader) {
 	rootCmd.AddCommand(loginCmd)
 	loginCmd.PersistentFlags().StringP("username", "u", "", "username")
 	loginCmd.PersistentFlags().StringP("password", "p", "", "password")
+	loginCmd.PersistentFlags().StringP("business", "b", "", "business")
 }

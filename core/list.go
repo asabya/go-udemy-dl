@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/Sab94/go-udemy-dl/repo"
 	"github.com/manifoldco/promptui"
@@ -50,35 +50,28 @@ type VDO struct {
 	Label string `json:"label"`
 }
 
-func (dl *Downloader) List() {
+func (dl *Downloader) List() error {
 	session, err := repo.GetSession(dl.Root)
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 	dl.Client.Jar.SetCookies(dl.BaseURL, session.Cookies)
 	dl.CSRF = session.CSRF
 	dl.AccessToken = session.AccessToken
 	dl.ClientID = session.ClientID
+	if session.Business != "null" {
+		dl.BaseURL, _ = url.ParseRequestURI("https://" + session.Business + ".udemy.com")
+	}
 	dl.BaseURL.Path = "/api-2.0/users/me/subscribed-courses"
 	urlStr := dl.BaseURL.String()
 	req, err := http.NewRequest("GET", urlStr+"?page_size=500", nil)
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
-	req.Header.Set("User-Agent", "StackOverflow")
-	req.Header.Set("X-Requested-With", "XMLHttpRequest")
-	req.Header.Set("X-Udemy-Bearer-Token", dl.AccessToken)
-	req.Header.Set("X-Udemy-Client-Id", dl.ClientID)
-	req.Header.Set("X-Udemy-Cache-User", dl.ClientID)
-	req.Header.Set("Authorization", "Bearer "+dl.AccessToken)
-	req.Header.Set("X-Udemy-Authorization", "Bearer "+dl.AccessToken)
-	req.Header.Set("Host", "www.udemy.com")
-	req.Header.Set("Referer", "https://www.udemy.com/join/login-popup")
-	req.Header.Set("Origin", "https://www.udemy.com")
-	req.Header.Set("Accept", "application/json")
+	dl.SetHeaders(req)
 	resp, err := dl.Client.Do(req)
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 	defer resp.Body.Close()
 	data, _ := ioutil.ReadAll(resp.Body)
@@ -102,34 +95,28 @@ func (dl *Downloader) List() {
 
 	i, _, err := prompt.Run()
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
-	log.Printf("Downloading : %s\n", k[i].Title)
-	dl.fetchCource(k[i])
+	fmt.Printf("Downloading : %s\n", k[i].Title)
+	err = dl.fetchCource(k[i])
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (dl *Downloader) fetchCource(course Course) {
+func (dl *Downloader) fetchCource(course Course) error {
 	dl.BaseURL.Path = "/api-2.0/courses/" + fmt.Sprintf("%v", course.ID) + "/cached-subscriber-curriculum-items"
 	urlStr := dl.BaseURL.String()
 	url := urlStr + "?page_size=1400&fields[lecture]=@min,object_index,asset,supplementary_assets,sort_order,is_published,is_free&fields[quiz]=@min,object_index,title,sort_order,is_published&fields[practice]=@min,object_index,title,sort_order,is_published&fields[chapter]=@min,description,object_index,title,sort_order,is_published&fields[asset]=@min,title,filename,asset_type,external_url,download_urls,stream_urls,length,status"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
-	req.Header.Set("User-Agent", "StackOverflow")
-	req.Header.Set("X-Requested-With", "XMLHttpRequest")
-	req.Header.Set("X-Udemy-Bearer-Token", dl.AccessToken)
-	req.Header.Set("X-Udemy-Client-Id", dl.ClientID)
-	req.Header.Set("X-Udemy-Cache-User", dl.ClientID)
-	req.Header.Set("Authorization", "Bearer "+dl.AccessToken)
-	req.Header.Set("X-Udemy-Authorization", "Bearer "+dl.AccessToken)
-	req.Header.Set("Host", "www.udemy.com")
-	req.Header.Set("Referer", "https://www.udemy.com/join/login-popup")
-	req.Header.Set("Origin", "https://www.udemy.com")
-	req.Header.Set("Accept", "application/json")
+	dl.SetHeaders(req)
 	resp, err := dl.Client.Do(req)
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 	defer resp.Body.Close()
 	data, _ := ioutil.ReadAll(resp.Body)
@@ -191,11 +178,22 @@ func (dl *Downloader) fetchCource(course Course) {
 
 	_, result, err := prompt.Run()
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
+	chap := ""
+	vCount := 0
 	for _, v := range allVideosList {
-		dl.readyDownload(v, result, course.Title)
+		if chap != v.Chapter {
+			vCount = 1
+			chap = v.Chapter
+		}
+		err := dl.readyDownload(v, result, v.Chapter, course.Title, vCount)
+		if err != nil {
+			return err
+		}
+		vCount++
 	}
+	return nil
 }
 
 func unique(intSlice []string) []string {

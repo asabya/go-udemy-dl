@@ -18,13 +18,7 @@ func (dl *Downloader) GetLogin() error {
 	if err != nil {
 		return err
 	}
-	req.Header.Set("User-Agent", "StackOverflow")
-	req.Header.Set("X-Requested-With", "XMLHttpRequest")
-	req.Header.Set("Authorization", "Basic YWQxMmVjYTljYmUxN2FmYWM2MjU5ZmU1ZDk4NDcxYTY6YTdjNjMwNjQ2MzA4ODI0YjIzMDFmZGI2MGVjZmQ4YTA5NDdlODJkNQ==")
-	req.Header.Set("Host", "www.udemy.com")
-	req.Header.Set("Referer", "https://www.udemy.com/join/login-popup")
-	req.Header.Set("Origin", "https://www.udemy.com")
-	req.Header.Set("Accept", "application/json")
+	dl.SetHeaders(req)
 	resp, err := dl.Client.Do(req)
 	if err != nil {
 		return err
@@ -60,15 +54,7 @@ func (dl *Downloader) DoLogin(email, password string) error {
 	if err != nil {
 		return err
 	}
-	reqPOST.Header.Set("User-Agent", "StackOverflow")
-	reqPOST.Header.Set("X-Requested-With", "XMLHttpRequest")
-	reqPOST.Header.Set("Authorization", "Basic YWQxMmVjYTljYmUxN2FmYWM2MjU5ZmU1ZDk4NDcxYTY6YTdjNjMwNjQ2MzA4ODI0YjIzMDFmZGI2MGVjZmQ4YTA5NDdlODJkNQ==")
-	reqPOST.Header.Set("Host", "www.udemy.com")
-	reqPOST.Header.Set("Referer", "https://www.udemy.com/join/login-popup")
-	reqPOST.Header.Set("Origin", "https://www.udemy.com")
-	reqPOST.Header.Set("Accept", "application/json")
-	reqPOST.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
+	dl.SetHeaders(reqPOST)
 	respost, err := dl.Client.Do(reqPOST)
 	if err != nil {
 		return err
@@ -85,7 +71,7 @@ func (dl *Downloader) DoLogin(email, password string) error {
 		return errors.New("Please check credentials")
 	}
 
-	err = repo.Init(dl.Root, email, dl.ClientID, dl.AccessToken, dl.CSRF, dl.BaseURL.String(), dl.Client.Jar.Cookies(dl.BaseURL))
+	err = repo.Init(dl.Root, email, dl.ClientID, dl.AccessToken, dl.CSRF, dl.BaseURL.String(), dl.Business, dl.Client.Jar.Cookies(dl.BaseURL))
 	if err != nil {
 		return err
 	}

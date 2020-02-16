@@ -13,6 +13,7 @@ import (
 var pkgLock sync.Mutex
 
 type Session struct {
+	Business    string
 	BaseURL     string
 	Username    string
 	AccessToken string
@@ -21,7 +22,7 @@ type Session struct {
 	ClientID    string
 }
 
-func Init(repoPath, username, clientId, accessToken, csrf, baseURL string, cookies []*http.Cookie) error {
+func Init(repoPath, username, clientId, accessToken, csrf, baseURL, business string, cookies []*http.Cookie) error {
 	pkgLock.Lock()
 	defer pkgLock.Unlock()
 
@@ -47,6 +48,7 @@ func Init(repoPath, username, clientId, accessToken, csrf, baseURL string, cooki
 		AccessToken: accessToken,
 		BaseURL:     baseURL,
 		CSRF:        csrf,
+		Business:    business,
 	}
 
 	// Write to session

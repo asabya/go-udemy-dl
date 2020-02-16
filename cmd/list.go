@@ -13,7 +13,11 @@ func initList(dl *core.Downloader) {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dl.List()
+			err := dl.List()
+			if err != nil {
+				cmd.Printf("List failed : %s\n", err.Error())
+				return err
+			}
 			return nil
 		},
 	}
