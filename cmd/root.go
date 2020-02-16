@@ -16,8 +16,8 @@ var rootCmd = &cobra.Command{
 func Execute() error {
 	dl := core.New()
 	initLogin(dl)
+	initLogout(dl)
 	initList(dl)
 	rootCmd.SilenceUsage = true
-	rootCmd.SilenceErrors = true
 	return rootCmd.Execute()
 }

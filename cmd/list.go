@@ -1,7 +1,11 @@
 package cmd
 
 import (
+	"errors"
+	"os"
+
 	"github.com/Sab94/go-udemy-dl/core"
+	"github.com/Sab94/go-udemy-dl/repo"
 	"github.com/spf13/cobra"
 )
 
@@ -10,7 +14,11 @@ func initList(dl *core.Downloader) {
 		Use:   "list",
 		Short: "List Subscribed Cources",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return nil
+			isLoggedin := repo.IsInitialized(dl.Root + string(os.PathSeparator) + "session")
+			if isLoggedin {
+				return nil
+			}
+			return errors.New("Please login to see list")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := dl.List()
